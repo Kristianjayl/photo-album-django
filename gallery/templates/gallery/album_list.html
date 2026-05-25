@@ -1,0 +1,36 @@
+{% extends 'gallery/base.html' %}
+{% block title %}My Albums{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+    <h1 style="margin:0;">All Albums</h1>
+    <a href="{% url 'album_create' %}" class="btn btn-primary">+ New Album</a>
+</div>
+
+<form method="GET" style="margin-bottom:2rem; display:flex; gap:10px;">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search albums..." class="form-control" style="margin:0;">
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if query %}<a href="{% url 'album_list' %}" class="btn btn-secondary">Clear</a>{% endif %}
+</form>
+
+<div style="display:flex; flex-wrap:wrap; gap:1.5rem;">
+    {% for album in albums %}
+    <div class="card" style="width:320px;">
+        <div class="card-body">
+            <h3 style="margin:0 0 0.5rem 0;">{{ album.name }}</h3>
+            <p style="color:#666; font-size:0.9rem; margin:0 0 0.5rem 0;">{{ album.description|truncatewords:12 }}</p>
+            <p style="color:#999; font-size:0.8rem;">By {{ album.owner.username }} &bull; {{ album.photos.count }} photo(s)</p>
+            <div style="display:flex; gap:8px; margin-top:1rem;">
+                <a href="{% url 'album_detail' album.pk %}" class="btn btn-primary">View</a>
+                {% if request.user == album.owner or request.user.is_staff %}
+                <a href="{% url 'album_update' album.pk %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'album_delete' album.pk %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p style="color:#999;">No albums found. <a href="{% url 'album_create' %}">Create one!</a></p>
+    {% endfor %}
+</div>
+{% endblock %}
